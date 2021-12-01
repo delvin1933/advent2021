@@ -9,15 +9,8 @@ fn main() {
     if let Ok(lines) = read_lines("./input.txt") {
         let mut sliding: Vec<i32> = Vec::new();
 
-        for (index, measure) in lines.iter().enumerate() {
-            let second = lines[index + 1];
-            let third = if index + 2 < lines.len() {
-                lines[index + 2]
-            } else {
-                break;
-            };
-
-            sliding.push(measure + second + third)
+        for measures in lines.windows(3) {
+            sliding.push(measures.iter().sum())
         }
 
         for measure in sliding {
