@@ -7,16 +7,27 @@ fn main() {
     let mut previous = 0;
 
     if let Ok(lines) = read_lines("./input.txt") {
-        for line in lines {
-            if let measure = line.unwrap().parse::<i32>().unwrap() {
-                if previous == 0 {
-                    previous = measure
-                } else if measure > previous {
-                    previous = measure;
-                    increased = increased + 1;
-                } else {
-                    previous = measure;
-                }
+        let mut sliding: Vec<i32> = Vec::new();
+
+        for (index, measure) in lines.iter().enumerate() {
+            let second = lines[index + 1];
+            let third = if index + 2 < lines.len() {
+                lines[index + 2]
+            } else {
+                break;
+            };
+
+            sliding.push(measure + second + third)
+        }
+
+        for measure in sliding {
+            if previous == 0 {
+                previous = measure
+            } else if measure > previous {
+                previous = measure;
+                increased = increased + 1;
+            } else {
+                previous = measure;
             }
         }
     }
@@ -24,10 +35,13 @@ fn main() {
     println!("{}", increased);
 }
 
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+fn read_lines<P>(filename: P) -> io::Result<Vec<i32>>
 where
     P: AsRef<Path>,
 {
     let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
+    Ok(io::BufReader::new(file)
+        .lines()
+        .map(|l| l.unwrap().parse::<i32>().unwrap())
+        .collect())
 }
