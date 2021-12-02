@@ -10,7 +10,6 @@ fn main() {
     if let Ok(lines) = read_lines("./input.txt") {
         for line in lines {
             let parts: Vec<&str> = line.split_whitespace().collect();
-            println!("Parts : {:?}", parts);
 
             match parts[0] {
                 "forward" => {
