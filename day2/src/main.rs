@@ -24,7 +24,9 @@ fn main() {
         }
     }
 
-    println!("{}", depth * horizontal)
+    println!("Part 1 {}", aim * horizontal);
+
+    println!("Part 2 {}", depth * horizontal)
 }
 
 fn read_lines<P>(filename: P) -> io::Result<Vec<String>>
