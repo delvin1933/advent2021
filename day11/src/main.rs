@@ -1,4 +1,3 @@
-use std::str::Matches;
 
 use simple_matrix::Matrix;
 
@@ -30,7 +29,6 @@ fn incr_energy(x: usize, y: usize, matrice: &mut MatrixOctopus) {
                 matrice.set(x, y, value + 1);
             } else if *value == 9 {
                 matrice.set(x, y, 10);
-                println!("{}, {}", x, y);
 
                 if x > 0 && y > 0 {
                     incr_energy(x - 1, y - 1, matrice);
@@ -96,11 +94,11 @@ fn main() {
     let mut count = 0;
 
     for _i in 0..100 {
-        count += step(&mut matrice.clone());
+        count += step(&mut matrice);
     }
     println!("Part 1 : {}", count);
 
-    count = 0;
+    count = 100;
     while !is_synchronised(&matrice) {
         step(&mut matrice);
         count += 1;
