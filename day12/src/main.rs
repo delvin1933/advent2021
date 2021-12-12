@@ -39,7 +39,7 @@ fn parse_input(input: Vec<String>) -> Graph {
             }
             None => {
                 if begin_str != "start".to_string() {
-                    let _ = cave.insert(end_str, vec![begin_str]);
+                    cave.insert(end_str, vec![begin_str]);
                 }
             }
         };
