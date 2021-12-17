@@ -227,7 +227,7 @@ fn main() {
     let (pack, _remainder) = parse_packet(&conv);
 
     println!("PART1 : {}", compute_version_num(&pack));
-    println!("PART2 : {}", usize::MAX - compute_packet(&pack));
+    println!("PART2 : {}", compute_packet(&pack));
 }
 
 mod tests {
