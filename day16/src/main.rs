@@ -8,7 +8,7 @@ use to_binary::BinaryString;
 #[derive(PartialEq, Eq, Debug)]
 enum PacketType {
     Literal,
-    Operator(u8),
+    Operator(u16),
     Err,
 }
 
@@ -16,7 +16,7 @@ impl PacketType {
     fn from_str(input: &str) -> Self {
         match input {
             "100" => Self::Literal,
-            _ => Self::Operator(u8::from_str_radix(input, 2).unwrap()),
+            _ => Self::Operator(u16::from_str_radix(input, 2).unwrap()),
         }
     }
 }
@@ -72,8 +72,8 @@ fn parse_packet(input: &str) -> (Packet, &str) {
         PacketType::Operator(op_type) => {
             let i_size_type: usize = 6;
 
-            match &input.chars().nth(i_size_type) {
-                Some('0') => {
+            match &input[i_size_type..i_size_type + 1] {
+                "0" => {
                     let mut sub_packets: Vec<Packet> = Vec::new();
                     let _length = usize::from_str_radix(&input[7..22], 2).unwrap();
 
