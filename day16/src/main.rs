@@ -1,11 +1,9 @@
-use to_binary::{BinaryError, BinaryString};
+use to_binary::BinaryString;
 
 // Type ID 0 : then the next 15 bits are a number that represents the total length in bits of the sub-packets contained by this packet.
 // Type ID 1 : then the next 11 bits are a number that represents the number of sub-packets immediately contained by this packet.
 // Type ID 4 : literal value
 // Type ID 6 : operator
-
-struct Version;
 
 #[derive(PartialEq, Eq, Debug)]
 enum PacketType {
@@ -18,7 +16,7 @@ impl PacketType {
     fn from_str(input: &str) -> Self {
         match input {
             "100" => Self::Literal,
-            _ => Self::Operator(u8::from_str_radix(&input, 2).unwrap()),
+            _ => Self::Operator(u8::from_str_radix(input, 2).unwrap()),
         }
     }
 }
@@ -50,7 +48,7 @@ fn parse_packet(input: &str) -> (Packet, &str) {
                 start_num += 5;
             }
 
-            let rang = (start_num + 1)..(start_num + 5);
+            let _rang = (start_num + 1)..(start_num + 5);
             binary_rep = format!("{}{}", binary_rep, &input[(start_num + 1)..(start_num + 5)]);
 
             (
@@ -70,7 +68,7 @@ fn parse_packet(input: &str) -> (Packet, &str) {
             match &input.chars().nth(i_size_type) {
                 Some('0') => {
                     let mut sub_packets: Vec<Packet> = Vec::new();
-                    let length = usize::from_str_radix(&input[7..22], 2).unwrap();
+                    let _length = usize::from_str_radix(&input[7..22], 2).unwrap();
 
                     let mut sub_input = &input[22..];
 
@@ -82,7 +80,7 @@ fn parse_packet(input: &str) -> (Packet, &str) {
 
                     (
                         Packet {
-                            version: version,
+                            version,
                             packet_type: PacketType::Operator(op_type),
                             literal_value: None,
                             operations_packets: Some(sub_packets),
@@ -107,12 +105,12 @@ fn parse_packet(input: &str) -> (Packet, &str) {
 
                     (
                         Packet {
-                            version: version,
+                            version,
                             packet_type: PacketType::Operator(op_type),
                             literal_value: None,
                             operations_packets: Some(sub_packets),
                         },
-                        &sub_input,
+                        sub_input,
                     )
                 }
             }
@@ -124,7 +122,7 @@ fn parse_packet(input: &str) -> (Packet, &str) {
                 literal_value: None,
                 operations_packets: None,
             },
-            &input,
+            input,
         ),
     }
 }
@@ -134,11 +132,7 @@ fn compute_version_num(packet: &Packet) -> u32 {
         PacketType::Literal => packet.version,
         PacketType::Operator(_) => match &packet.operations_packets {
             Some(sub_packets) => {
-                packet.version
-                    + sub_packets
-                        .iter()
-                        .map(|p| compute_version_num(p))
-                        .sum::<u32>()
+                packet.version + sub_packets.iter().map(compute_version_num).sum::<u32>()
             }
             None => 0,
         },
@@ -151,18 +145,16 @@ fn main() {
             .unwrap()
             .to_string();
 
-    let (pack, remainder) = parse_packet(&conv);
+    let (pack, _remainder) = parse_packet(&conv);
 
     println!("PART1 : {}", compute_version_num(&pack));
 }
 
 mod tests {
 
-    use super::*;
-
     #[test]
     fn test_parsing() {
-        let input = "38006F45291200";
+        let _input = "38006F45291200";
 
         let conv = BinaryString::from_hex("38006F45291200")
             .unwrap()
@@ -190,13 +182,13 @@ mod tests {
 
     #[test]
     fn test_parse_second_example() {
-        let input = "38006F45291200";
+        let _input = "38006F45291200";
 
         let conv = BinaryString::from_hex("38006F45291200")
             .unwrap()
             .to_string();
 
-        let (pack, remainder) = parse_packet(&conv);
+        let (_pack, _remainder) = parse_packet(&conv);
 
         assert_eq!(1, 1);
     }
@@ -205,7 +197,7 @@ mod tests {
     fn test_parse_third_example() {
         let input = "11101110000000001101010000001100100000100011000001100000";
 
-        let (pack, remainder) = parse_packet(&input);
+        let (_pack, _remainder) = parse_packet(input);
 
         assert_eq!(1, 1);
     }
@@ -216,7 +208,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        let (pack, remainder) = parse_packet(&conv);
+        let (pack, _remainder) = parse_packet(&conv);
 
         assert_eq!(16, compute_version_num(&pack));
     }
@@ -227,7 +219,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        let (pack, remainder) = parse_packet(&conv);
+        let (pack, _remainder) = parse_packet(&conv);
 
         assert_eq!(12, compute_version_num(&pack));
     }
@@ -238,7 +230,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        let (pack, remainder) = parse_packet(&conv);
+        let (pack, _remainder) = parse_packet(&conv);
 
         assert_eq!(31, compute_version_num(&pack));
     }
@@ -249,7 +241,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        let (pack, remainder) = parse_packet(&conv);
+        let (pack, _remainder) = parse_packet(&conv);
 
         assert_eq!(23, compute_version_num(&pack));
     }
