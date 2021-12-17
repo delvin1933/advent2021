@@ -16,7 +16,6 @@ enum PacketType {
 
 impl PacketType {
     fn from_str(input: &str) -> Self {
-        println!("INPUT : {}", input);
         match input {
             "100" => Self::Literal,
             _ => Self::Operator(u8::from_str_radix(&input, 2).unwrap()),
@@ -40,10 +39,6 @@ struct Packet {
 
 fn parse_packet(input: &str) -> (Packet, &str) {
     let version = u32::from_str_radix(&input[0..3], 2).unwrap();
-
-    println!("Version : {}", &input[0..3]);
-
-    println!("{:?}", &input[3..6]);
 
     match PacketType::from_str(&input[3..6]) {
         PacketType::Literal => {
@@ -70,15 +65,12 @@ fn parse_packet(input: &str) -> (Packet, &str) {
         }
 
         PacketType::Operator(op_type) => {
-            println!("OPERATOR : {}", op_type);
             let i_size_type: usize = 6;
 
             match &input.chars().nth(i_size_type) {
                 Some('0') => {
                     let mut sub_packets: Vec<Packet> = Vec::new();
                     let length = usize::from_str_radix(&input[7..22], 2).unwrap();
-
-                    println!("INPUT : {:?}, LENGTH : {} ", &input, length);
 
                     let mut sub_input = &input[22..];
 
@@ -95,21 +87,22 @@ fn parse_packet(input: &str) -> (Packet, &str) {
                             literal_value: None,
                             operations_packets: Some(sub_packets),
                         },
-                        &input[length..],
+                        sub_input,
                     )
                 }
                 _ => {
                     let num_pack = usize::from_str_radix(&input[7..18], 2).unwrap();
-                    println!("NUM SUB PACK : {}", num_pack);
 
                     let mut sub_packets: Vec<Packet> = Vec::new();
 
                     let mut sub_input = &input[18..];
 
                     for _i in 0..num_pack {
-                        let (pack, remainder) = parse_packet(sub_input);
-                        sub_packets.push(pack);
-                        sub_input = remainder;
+                        if sub_input.len() > 11 {
+                            let (pack, remainder) = parse_packet(sub_input);
+                            sub_packets.push(pack);
+                            sub_input = remainder;
+                        }
                     }
 
                     (
@@ -160,9 +153,6 @@ fn main() {
 
     let (pack, remainder) = parse_packet(&conv);
 
-    println!("PACKET : {:?}", pack);
-    println!("REM : {:?}", remainder);
-
     println!("PART1 : {}", compute_version_num(&pack));
 }
 
@@ -208,9 +198,6 @@ mod tests {
 
         let (pack, remainder) = parse_packet(&conv);
 
-        println!("PACKET : {:?}", pack);
-        println!("REM : {:?}", remainder);
-
         assert_eq!(1, 1);
     }
 
@@ -219,9 +206,6 @@ mod tests {
         let input = "11101110000000001101010000001100100000100011000001100000";
 
         let (pack, remainder) = parse_packet(&input);
-
-        println!("PACKET : {:?}", pack);
-        println!("REM : {:?}", remainder);
 
         assert_eq!(1, 1);
     }
@@ -234,9 +218,6 @@ mod tests {
 
         let (pack, remainder) = parse_packet(&conv);
 
-        println!("PACKET : {:?}", pack);
-        println!("REM : {:?}", remainder);
-
         assert_eq!(16, compute_version_num(&pack));
     }
 
@@ -247,9 +228,6 @@ mod tests {
             .to_string();
 
         let (pack, remainder) = parse_packet(&conv);
-
-        println!("PACKET : {:?}", pack);
-        println!("REM : {:?}", remainder);
 
         assert_eq!(12, compute_version_num(&pack));
     }
@@ -262,9 +240,6 @@ mod tests {
 
         let (pack, remainder) = parse_packet(&conv);
 
-        println!("PACKET : {:?}", pack);
-        println!("REM : {:?}", remainder);
-
         assert_eq!(31, compute_version_num(&pack));
     }
 
@@ -275,9 +250,6 @@ mod tests {
             .to_string();
 
         let (pack, remainder) = parse_packet(&conv);
-
-        println!("PACKET : {:?}", pack);
-        println!("REM : {:?}", remainder);
 
         assert_eq!(23, compute_version_num(&pack));
     }
